@@ -13,7 +13,11 @@ win32 {
     RC_FILE = app.rc
 }
 
-TARGET = qlogin
+macx {
+	ICON = appicon.icns
+}
+
+TARGET = QAutoLogin
 TEMPLATE = app
 
 TRANSLATIONS = qautologin_ja.ts
