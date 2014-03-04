@@ -14,7 +14,7 @@ win32 {
 }
 
 macx {
-	ICON = appicon.icns
+    ICON = appicon.icns
 }
 
 TARGET = QAutoLogin
