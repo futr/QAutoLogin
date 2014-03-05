@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    const QString trFilename = "qautologin_";
+    const QString trFilename = ":/translations/qautologin_";
     QString locale = QLocale::system().name();
     QTranslator translator;
 
@@ -20,6 +20,6 @@ int main(int argc, char *argv[])
 
     MainWidget w;
     w.show();
-    
+
     return a.exec();
 }
