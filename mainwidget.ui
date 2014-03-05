@@ -301,13 +301,13 @@
   <customwidget>
    <class>QWebView</class>
    <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
+   <header>QtWebKit/QWebView</header>
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>serverNameEdit</tabstop>
   <tabstop>idEdit</tabstop>
   <tabstop>passEdit</tabstop>
+  <tabstop>serverNameEdit</tabstop>
   <tabstop>repeatCheckBox</tabstop>
   <tabstop>repatSpinBox</tabstop>
   <tabstop>stopTimerButton</tabstop>
@@ -340,8 +340,8 @@
      <y>15</y>
     </hint>
     <hint type="destinationlabel">
-     <x>404</x>
-     <y>158</y>
+     <x>463</x>
+     <y>205</y>
     </hint>
    </hints>
   </connection>
@@ -356,8 +356,8 @@
      <y>51</y>
     </hint>
     <hint type="destinationlabel">
-     <x>415</x>
-     <y>162</y>
+     <x>463</x>
+     <y>205</y>
     </hint>
    </hints>
   </connection>
@@ -368,12 +368,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>207</x>
-     <y>69</y>
+     <x>301</x>
+     <y>102</y>
     </hint>
     <hint type="destinationlabel">
-     <x>422</x>
-     <y>153</y>
+     <x>463</x>
+     <y>205</y>
     </hint>
    </hints>
   </connection>
