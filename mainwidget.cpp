@@ -129,31 +129,75 @@ void MainWidget::readyReadSlot()
     // ready read slot
     QNetworkReply *reply = qobject_cast< QNetworkReply *>( sender() );
 
-    // show to webkit
-    ui->webView->setContent( reply->readAll() );
+    // バッファに読み込み
+    QByteArray buffer( reply->readAll() );
+
+    // パーサー作成
+    QXmlStreamReader reader( buffer );
 
     // analyze html
-    QWebElementCollection loginTime = ui->webView->page()->mainFrame()->documentElement().findAll( "span[id=loginTime]" );
-    QWebElementCollection logoutTIme = ui->webView->page()->mainFrame()->documentElement().findAll( "span[id=logoutTime]" );
-    QStringList htmlList = ui->webView->page()->mainFrame()->toPlainText().split( "\n" );
+    QString loginTime;
+    QString logoutTime;
+    LoginStatus stat = lsFailed;
 
-    // Make message
-    if ( loginTime.count() ) {
-        // login complete
-        if ( trayIcon->isVisible() ) {
-            trayIcon->showMessage( tr( "Login" ), QString() + tr( "Login time\t : " ) + loginTime.first().toPlainText() + tr( "\nLogout time\t : " ) + logoutTIme.first().toPlainText() );
+    while ( !reader.atEnd() ) {
+        // 次の要素を読む
+        reader.readNext();
+
+        // タグ開始
+        if ( reader.isStartElement() ) {
+            if ( reader.name() == "span" && reader.attributes().value( "id" ).toString() == "loginTime" ) {
+                // ログイン時間取得
+                loginTime = reader.readElementText();
+
+                // ログイン成功
+                stat = lsLogin;
+            } else if ( reader.name() == "span" && reader.attributes().value( "id" ).toString() == "logoutTime" ) {
+                // ログアウト時間取得
+                logoutTime = reader.readElementText();
+            } else if ( reader.name() == "p" && reader.attributes().value( "class" ).toString() == "subcaption" ) {
+                // ログインかログアウトか判別
+                QString mode = reader.readElementText();
+
+                if ( mode == "Logout" || mode == "ログアウト" ) {
+                    stat = lsLogout;
+                }
+            }
         }
-    } else if ( htmlList.indexOf( "ログアウトしました" ) != -1 ) {
-        // logout complete
+    }
+
+    // メッセージ作成
+    QString info;
+    QString title;
+
+    if ( stat == lsLogin ) {
+        // ログイン成功
+        title = tr( "Login" );
+        info  = QString() + tr( "Login time\t : " ) + loginTime + tr( "\nLogout time\t : " ) + logoutTime;
+
         if ( trayIcon->isVisible() ) {
-            trayIcon->showMessage( tr( "Logout" ), tr( "Logout complete." ) );
+            trayIcon->showMessage( title, info );
+        }
+    } else if ( stat == lsLogout ) {
+        // logout complete
+        title = tr( "Logout" );
+        info  = tr( "Logout succeeded" );
+
+        if ( trayIcon->isVisible() ) {
+            trayIcon->showMessage( title, info );
         }
     } else {
         // error
+        title = tr( "Error" );
+        info  = tr( "Some errors occurred" );
+
         if ( trayIcon->isVisible() ) {
-            trayIcon->showMessage( tr( "Error" ), tr( "Some error occurred." ), QSystemTrayIcon::Warning );
+            trayIcon->showMessage( title, info, QSystemTrayIcon::Warning );
         }
     }
+
+    // ラベルに表示
+    ui->messageLabel->setText( title + "\n" + info );
 
     // delete reply
     reply->deleteLater();

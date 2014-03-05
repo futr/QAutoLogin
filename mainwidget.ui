@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>474</width>
-    <height>598</height>
+    <height>516</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -187,16 +187,20 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="title">
-      <string>Preview</string>
+      <string>Message</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QWebView" name="webView">
-        <property name="url">
-         <url>
-          <string>about:blank</string>
-         </url>
+       <widget class="QLabel" name="messageLabel">
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
@@ -222,14 +226,14 @@
      <item>
       <widget class="QCheckBox" name="autoToTrayCheckBox">
        <property name="text">
-        <string>&amp;Minimize to systemtray when apllication started</string>
+        <string>&amp;Minimize to systemtray when application starts</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QCheckBox" name="autoStartCheckBox">
        <property name="text">
-        <string>Login with saved id and password when application &amp;started</string>
+        <string>Login with saved id and password when application &amp;starts</string>
        </property>
       </widget>
      </item>
@@ -252,16 +256,16 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QPushButton" name="closeButton">
+      <widget class="QPushButton" name="saveConfigButton">
        <property name="text">
-        <string>&amp;Quit</string>
+        <string>Save &amp;Config</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="minimizePushButton">
+      <widget class="QPushButton" name="aboutButton">
        <property name="text">
-        <string>Minimize to &amp;tray</string>
+        <string>&amp;About Qt</string>
        </property>
       </widget>
      </item>
@@ -279,16 +283,16 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="aboutButton">
+      <widget class="QPushButton" name="minimizePushButton">
        <property name="text">
-        <string>&amp;About Qt</string>
+        <string>Minimize to &amp;tray</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="saveConfigButton">
+      <widget class="QPushButton" name="closeButton">
        <property name="text">
-        <string>Save &amp;Config</string>
+        <string>&amp;Quit</string>
        </property>
       </widget>
      </item>
@@ -297,13 +301,6 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKit/QWebView</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>idEdit</tabstop>
   <tabstop>passEdit</tabstop>
@@ -313,17 +310,12 @@
   <tabstop>stopTimerButton</tabstop>
   <tabstop>logoutButton</tabstop>
   <tabstop>loginButton</tabstop>
-  <tabstop>webView</tabstop>
   <tabstop>ipEdit</tabstop>
   <tabstop>checkIpButton</tabstop>
   <tabstop>autoToTrayCheckBox</tabstop>
   <tabstop>autoStartCheckBox</tabstop>
   <tabstop>saveIdCheckBox</tabstop>
   <tabstop>savePassCheckBox</tabstop>
-  <tabstop>closeButton</tabstop>
-  <tabstop>minimizePushButton</tabstop>
-  <tabstop>aboutButton</tabstop>
-  <tabstop>saveConfigButton</tabstop>
  </tabstops>
  <resources>
   <include location="resource.qrc"/>

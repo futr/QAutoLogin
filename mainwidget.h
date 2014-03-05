@@ -14,10 +14,10 @@
 #include <QAction>
 #include <QSettings>
 #include <QCloseEvent>
-#include <QWebFrame>
-#include <QWebElement>
 #include <QStringList>
 #include <QNetworkAddressEntry>
+#include <QXmlStreamReader>
+#include <QBuffer>
 #include <QSslError>
 
 namespace Ui {
@@ -27,11 +27,11 @@ class MainWidget;
 class MainWidget : public QWidget
 {
     Q_OBJECT
-    
+
 public:
     explicit MainWidget(QWidget *parent = 0);
     ~MainWidget();
-    
+
 private slots:
     void on_loginButton_clicked();
 
@@ -87,6 +87,13 @@ private:
     QAction *showAction;
 
     QSettings *setting;
+
+private:
+    enum LoginStatus {
+        lsLogin,
+        lsLogout,
+        lsFailed,
+    };
 };
 
 #endif // MAINWIDGET_H

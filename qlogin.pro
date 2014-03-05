@@ -6,8 +6,7 @@
 
 QT       += core gui network
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
-lessThan(QT_MAJOR_VERSION, 5): QT += webkit
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 win32 {
     RC_FILE = app.rc
