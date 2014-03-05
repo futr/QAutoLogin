@@ -299,37 +299,33 @@ void MainWidget::sslErrorSlot(const QList<QSslError> &errors)
     QNetworkReply *reply = qobject_cast< QNetworkReply *>( sender() );
     QString errString;
 
+    // iOSでは不完全型となっているため直接アクセスしない
+#ifndef Q_OS_IOS
     foreach ( QSslError err, errors ) {
         errString += err.errorString() + "\n";
     }
+#endif
 
-    // Auto ignore
-    reply->ignoreSslErrors( errors );
+    // 全エラー無視（本来は確認すべき）
+    reply->ignoreSslErrors();
 
     // view ssl error
     if ( isVisible() ) {
         QMessageBox::warning( this, tr( "Ssl warning" ), errString + tr( "\n\nThese \"SslError\" are ignored." ) );
     }
-
-    /*
-    if ( QMessageBox::question( this, tr( "Ssl errors" ), errString, QMessageBox::Ignore, QMessageBox::Cancel ) == QMessageBox::Cancel ) {
-        // cancel
-        return;
-    } else {
-        // ignore
-        reply->ignoreSslErrors( errors );
-    }
-    */
-
-    // reply->deleteLater();
 }
 
 void MainWidget::trayIconClickSlot( QSystemTrayIcon::ActivationReason reason )
 {
     // tray icon clicked
     if ( reason == QSystemTrayIcon::Trigger ) {
-        this->show();
+        // Macの場合ここでhideすると落ちるためなにもしない
+#ifdef Q_OS_MAC
+        return;
+#endif
+
         trayIcon->hide();
+        this->show();
     }
 }
 
