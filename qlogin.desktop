@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=QAutoLogin
+Comment=Auto login tool
+Icon=/path/to/qlogin/icon.ico
+Exec=/path/to/qlogin/qlogin
+Terminal=false
+Path=/path/to/qlogin
+
