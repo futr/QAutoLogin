@@ -17,8 +17,13 @@ MainWidget::MainWidget(QWidget *parent) :
     // create manager
     manager = new QNetworkAccessManager( this );
 
-    // setting ( if you )
+    // setting
+#ifdef Q_OS_MAC
+    setting = new QSettings( QSettings::IniFormat, QSettings::UserScope, "futr", "QAutoLogin" );
+    setting->setFallbacksEnabled( false );
+#else
     setting = new QSettings( "conf.ini", QSettings::IniFormat, this );
+#endif
 
     // load setting
     loadConfigSlot();
