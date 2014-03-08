@@ -9,5 +9,3 @@ QAutoLogin
 
 * Qt5以上
 * Windows or MacOSX or Linux
-
-適切にクラス化されていないため，今のところiOS,Android,SailfishOS,UbuntuPhoneでは動作しません．
