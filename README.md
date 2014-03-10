@@ -1,7 +1,7 @@
 QAutoLogin
 ==========
 
-校内LANなどのスイッチにWEB認証に定期的に自動的にログインすることができます．
+スイッチのWEB認証に定期的に自動的にログインすることができます．
 
 ### ビルド環境
 
@@ -9,5 +9,3 @@ QAutoLogin
 
 * Qt5以上
 * Windows or MacOSX or Linux
-
-適切にクラス化されていないため，今のところiOS,Android,SailfishOS,UbuntuPhoneでは動作しません．
