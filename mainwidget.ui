@@ -90,9 +90,6 @@
        <property name="placeholderText">
         <string>https://auth.server.example/</string>
        </property>
-       <property name="clearButtonEnabled">
-        <bool>false</bool>
-       </property>
       </widget>
      </item>
     </layout>

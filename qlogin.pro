@@ -22,9 +22,11 @@ TEMPLATE = app
 TRANSLATIONS = qautologin_ja.ts
 
 SOURCES += main.cpp\
-        mainwidget.cpp
+        mainwidget.cpp \
+    loginwebauth.cpp
 
-HEADERS  += mainwidget.h
+HEADERS  += mainwidget.h \
+    loginwebauth.h
 
 FORMS    += mainwidget.ui
 
