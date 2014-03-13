@@ -14,9 +14,6 @@ MainWidget::MainWidget(QWidget *parent) :
     // set echomode
     ui->passEdit->setEchoMode( QLineEdit::Password );
 
-    // create manager
-    manager = new QNetworkAccessManager( this );
-
     // setting
 #ifdef Q_OS_MAC
     setting = new QSettings( QSettings::IniFormat, QSettings::UserScope, "futr", "QAutoLogin" );
@@ -32,7 +29,10 @@ MainWidget::MainWidget(QWidget *parent) :
     connect( &statusTimer, SIGNAL(timeout()), SLOT(updateStatusSlot()) );
     connect( &timer, SIGNAL(timeout()), this, SLOT(loginSlot()) );
 
-    // class no zikkenn public toka
+    // ネットワークのエラーを接続
+    connect( &webAuth, SIGNAL(sslErrorOccurred(QList<QSslError>)), this, SLOT(sslErrorSlot(QList<QSslError>)) );
+    connect( &webAuth, SIGNAL(networkErrorOccurred(QNetworkReply::NetworkError)), this, SLOT(networkErrorSlot(QNetworkReply::NetworkError)) );
+    connect( &webAuth, SIGNAL(finished(LoginWebAuth::AuthStatus)), this ,SLOT(readyReadSlot(LoginWebAuth::AuthStatus)) );
 }
 
 MainWidget::~MainWidget()
@@ -80,111 +80,49 @@ void MainWidget::on_loginButton_clicked()
 
 void MainWidget::loginSlot()
 {
-    // login slot
-    QString send_data;
+    // ログイン
+    webAuth.setServerUrl( ui->serverNameEdit->text() );
+    webAuth.setUserName( ui->idEdit->text() );
+    webAuth.setPassword( ui->passEdit->text() );
 
-    // AccessManager mode
-    QNetworkRequest request;
+    // SSLエラー無視
+    webAuth.setIgnoreSslError();
 
-    // clear counter
-    ui->progressBar->setValue( timer.interval() / 1000 / 60 );
-    ui->progressBar->setMaximum( timer.interval() / 1000 / 60 );
-
-    send_data = "uid=" + ui->idEdit->text() + "&pwd=" + ui->passEdit->text()
-              + "&Submit1=%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3";
-
-    // set url
-    request.setUrl( QUrl( ui->serverNameEdit->text() + "cgi-bin/Login.cgi" ) );
-    request.setRawHeader( "Content-type", "application/x-www-form-urlencoded" );
-
-    // get
-    QNetworkReply *reply = manager->post( request, send_data.toUtf8() );
-
-    // connect
-    connect( reply, SIGNAL(finished()), this, SLOT(readyReadSlot()) );
-    connect( reply, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(sslErrorSlot(QList<QSslError>)) );
-    connect( reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(networkErrorSlot(QNetworkReply::NetworkError)) );
+    webAuth.login();
 }
 
 void MainWidget::logoutSlot()
 {
     // logout slot
-    QString send_data;
+    webAuth.setServerUrl( ui->serverNameEdit->text() );
+    webAuth.setUserName( ui->idEdit->text() );
+    webAuth.setPassword( ui->passEdit->text() );
 
-    // AccessManager mode
-    QNetworkRequest request;
+    // SSLエラー無視
+    webAuth.setIgnoreSslError();
 
-    send_data = "Submit2=%E3%83%AD%E3%82%B0%E3%82%A2%E3%82%A6%E3%83%88";
-
-    // set url
-    request.setUrl( QUrl( ui->serverNameEdit->text() + "cgi-bin/Logout.cgi" ) );
-    request.setRawHeader( "Content-type", "application/x-www-form-urlencoded" );
-
-    // get
-    QNetworkReply *reply = manager->post( request, send_data.toUtf8() );
-
-    // connect
-    connect( reply, SIGNAL(finished()), this, SLOT(readyReadSlot()) );
-    connect( reply, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(sslErrorSlot(QList<QSslError>)) );
-    connect( reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(networkErrorSlot(QNetworkReply::NetworkError)) );
+    webAuth.logout();
 }
 
-void MainWidget::readyReadSlot()
+void MainWidget::readyReadSlot( LoginWebAuth::AuthStatus stat )
 {
-    // ready read slot
-    QNetworkReply *reply = qobject_cast< QNetworkReply *>( sender() );
-
-    // バッファに読み込み
-    QByteArray buffer( reply->readAll() );
-
-    // パーサー作成
-    QXmlStreamReader reader( buffer );
-
-    // analyze html
-    QString loginTime;
-    QString logoutTime;
-    LoginStatus stat = lsFailed;
-
-    while ( !reader.atEnd() ) {
-        // 次の要素を読む
-        reader.readNext();
-
-        // タグ開始
-        if ( reader.isStartElement() ) {
-            if ( reader.name() == "span" && reader.attributes().value( "id" ).toString() == "loginTime" ) {
-                // ログイン時間取得
-                loginTime = reader.readElementText();
-
-                // ログイン成功
-                stat = lsLogin;
-            } else if ( reader.name() == "span" && reader.attributes().value( "id" ).toString() == "logoutTime" ) {
-                // ログアウト時間取得
-                logoutTime = reader.readElementText();
-            } else if ( reader.name() == "p" && reader.attributes().value( "class" ).toString() == "subcaption" ) {
-                // ログインかログアウトか判別
-                QString mode = reader.readElementText();
-
-                if ( mode == "Logout" || mode == "ログアウト" ) {
-                    stat = lsLogout;
-                }
-            }
-        }
-    }
+    // 通信完了
 
     // メッセージ作成
     QString info;
     QString title;
 
-    if ( stat == lsLogin ) {
+    if ( stat == LoginWebAuth::LoginSucceeded ) {
         // ログイン成功
         title = tr( "Login" );
-        info  = QString() + tr( "Login time\t : " ) + loginTime + tr( "\nLogout time\t : " ) + logoutTime;
+        info  = QString() + tr( "Login time\t : " ) + webAuth.loginTime().toString( Qt::DefaultLocaleShortDate )
+                + tr( "\nLogout time\t : " ) + webAuth.autoLogoutTime().toString( Qt::DefaultLocaleShortDate );
 
         if ( trayIcon->isVisible() ) {
             trayIcon->showMessage( title, info );
         }
-    } else if ( stat == lsLogout ) {
-        // logout complete
+    } else if ( stat == LoginWebAuth::LogoutSucceeded ) {
+        // ログアウト成功
         title = tr( "Logout" );
         info  = tr( "Logout succeeded" );
 
@@ -203,9 +141,6 @@ void MainWidget::readyReadSlot()
 
     // ラベルに表示
     ui->messageLabel->setText( title + "\n" + info );
-
-    // delete reply
-    reply->deleteLater();
 }
 
 void MainWidget::saveConfigSlot()

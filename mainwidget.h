@@ -3,12 +3,8 @@
 
 #include <QWidget>
 #include <QTimer>
-#include <QtNetwork/QTcpSocket>
 #include <QMessageBox>
 #include <QDebug>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
@@ -16,9 +12,7 @@
 #include <QCloseEvent>
 #include <QStringList>
 #include <QNetworkAddressEntry>
-#include <QXmlStreamReader>
-#include <QBuffer>
-#include <QSslError>
+#include "loginwebauth.h"
 
 namespace Ui {
 class MainWidget;
@@ -37,7 +31,7 @@ private slots:
 
     void loginSlot();
     void logoutSlot();
-    void readyReadSlot();
+    void readyReadSlot( LoginWebAuth::AuthStatus stat );
     void saveConfigSlot();
     void loadConfigSlot();
     void minimizeSlot();
@@ -72,11 +66,10 @@ protected:
 private:
     Ui::MainWidget *ui;
 
-    QTcpSocket socket;
     QTimer timer;
     QTimer statusTimer;
 
-    QNetworkAccessManager *manager;
+    LoginWebAuth webAuth;
 
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
@@ -87,13 +80,6 @@ private:
     QAction *showAction;
 
     QSettings *setting;
-
-private:
-    enum LoginStatus {
-        lsLogin,
-        lsLogout,
-        lsFailed,
-    };
 };
 
 #endif // MAINWIDGET_H
