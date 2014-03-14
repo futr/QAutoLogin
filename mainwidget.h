@@ -12,6 +12,7 @@
 #include <QCloseEvent>
 #include <QStringList>
 #include <QNetworkAddressEntry>
+#include <QProcess>
 #include "loginwebauth.h"
 
 namespace Ui {
@@ -41,6 +42,7 @@ private slots:
     void trayIconClickSlot( QSystemTrayIcon::ActivationReason reason );
     void networkErrorSlot( QNetworkReply::NetworkError code );
     void checkIpSlot();
+    void renewIP();
 
     void on_aboutButton_clicked();
 
@@ -55,6 +57,8 @@ private slots:
     void on_minimizePushButton_clicked();
 
     void on_checkIpButton_clicked();
+
+    void on_renewIPButton_clicked();
 
 private:
     void createTrayIcon();

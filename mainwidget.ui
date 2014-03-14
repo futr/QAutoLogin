@@ -14,7 +14,7 @@
    <string>QAutoLogin</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resource.qrc">
+   <iconset>
     <normaloff>:/image/icon.png</normaloff>:/image/icon.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -222,6 +222,13 @@
       <widget class="QLineEdit" name="ipEdit"/>
      </item>
      <item>
+      <widget class="QPushButton" name="renewIPButton">
+       <property name="text">
+        <string>Re&amp;new IP</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="checkIpButton">
        <property name="text">
         <string>Check &amp;IP</string>
@@ -326,9 +333,7 @@
   <tabstop>saveIdCheckBox</tabstop>
   <tabstop>savePassCheckBox</tabstop>
  </tabstops>
- <resources>
-  <include location="resource.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>serverNameEdit</sender>

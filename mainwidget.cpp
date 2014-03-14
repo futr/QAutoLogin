@@ -288,6 +288,23 @@ void MainWidget::checkIpSlot()
     }
 }
 
+void MainWidget::renewIP()
+{
+    // IPを更新する ( Windows only )
+#ifdef Q_OS_WIN
+    QProcess *process;
+
+    process = new QProcess( this );
+
+    process->start( "ipconfig", QStringList() << "/release" );
+    process->waitForFinished();
+    process->start( "ipconfig", QStringList() << "/renew" );
+    process->waitForFinished();
+
+    delete process;
+#endif
+}
+
 void MainWidget::on_aboutButton_clicked()
 {
     // aboutQt
@@ -382,4 +399,10 @@ void MainWidget::on_checkIpButton_clicked()
 {
     // check ip
     checkIpSlot();
+}
+
+void MainWidget::on_renewIPButton_clicked()
+{
+    // IPを再取得
+    renewIP();
 }
