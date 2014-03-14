@@ -3,7 +3,8 @@
 
 MainWidget::MainWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::MainWidget)
+    ui(new Ui::MainWidget),
+    m_ipconfig( new QProcess( this ) )
 {
     ui->setupUi(this);
 
@@ -24,6 +25,15 @@ MainWidget::MainWidget(QWidget *parent) :
 
     // load setting
     loadConfigSlot();
+
+    // 読み込まれた設定によってフォーカスを制御
+    if ( setting->value( "Auth" ).toString().length() == 0 ) {
+        ui->serverNameEdit->setFocus();
+    } else if ( setting->value( "ID" ).toString().length() == 0 ) {
+        ui->idEdit->setFocus();
+    } else {
+        ui->passEdit->setFocus();
+    }
 
     // connect timer
     connect( &statusTimer, SIGNAL(timeout()), SLOT(updateStatusSlot()) );
@@ -56,11 +66,24 @@ void MainWidget::on_loginButton_clicked()
 
     if ( ui->repeatCheckBox->isChecked() ) {
         // repeat login
-        timer.setInterval( ui->repatSpinBox->value() * 60 * 1000 );
+        int repeatTime;
+
+        // 必要なら乱数でぶらす
+        repeatTime = ui->repatSpinBox->value();
+
+        if ( ui->randomizeCheckBox->isChecked() && ui->randomizeSpinBox->value() != 0 ) {
+            repeatTime += ( qrand() % ui->randomizeSpinBox->value() ) * ( ( qrand() % 2 ) * -1 );
+        }
+
+        if ( repeatTime < 0 ) {
+            repeatTime = 1;
+        }
+
+        timer.setInterval( repeatTime * 60 * 1000 );
 
         // set progress
-        ui->progressBar->setMaximum( ui->repatSpinBox->value() );
-        ui->progressBar->setValue( ui->repatSpinBox->value() );
+        ui->progressBar->setMaximum( repeatTime );
+        ui->progressBar->setValue( repeatTime );
 
         // set status timer
         statusTimer.setInterval( 1000 * 60 );
@@ -141,6 +164,11 @@ void MainWidget::readyReadSlot( LoginWebAuth::AuthStatus stat )
 
     // ラベルに表示
     ui->messageLabel->setText( title + "\n" + info );
+
+    // 成功していて必要ならIP更新
+    if ( ui->renewIPCheckBox->isChecked() && ( stat == LoginWebAuth::LoginSucceeded || stat == LoginWebAuth::LoginSucceeded ) ) {
+        renewIP();
+    }
 }
 
 void MainWidget::saveConfigSlot()
@@ -149,14 +177,16 @@ void MainWidget::saveConfigSlot()
 
     // save check
     setting->setValue( "Repeat", ui->repeatCheckBox->isChecked() );
-
     setting->setValue( "AutoMinimize", ui->autoToTrayCheckBox->isChecked() );
     setting->setValue( "AutoStart", ui->autoStartCheckBox->isChecked() );
     setting->setValue( "ConfigId", ui->saveIdCheckBox->isChecked() );
     setting->setValue( "ConfigPass", ui->savePassCheckBox->isChecked() );
-
     setting->setValue( "RepeatMin", ui->repatSpinBox->value() );
     setting->setValue( "Auth", ui->serverNameEdit->text() );
+    setting->setValue( "AutoLogout", ui->autoLogoutCheckBox->isChecked() );
+    setting->setValue( "AutoRenewIP", ui->renewIPCheckBox->isChecked() );
+    setting->setValue( "RandomizeEnable", ui->randomizeCheckBox->isChecked() );
+    setting->setValue( "RandomizeRange", ui->randomizeSpinBox->value() );
 
     // if need id,pass
     if ( ui->saveIdCheckBox->isChecked() ) {
@@ -174,14 +204,16 @@ void MainWidget::loadConfigSlot()
 
     // load check
     ui->repeatCheckBox->setChecked( setting->value( "Repeat" ).toBool() );
-
     ui->autoToTrayCheckBox->setChecked( setting->value( "AutoMinimize" ).toBool() );
     ui->autoStartCheckBox->setChecked( setting->value( "AutoStart" ).toBool() );
     ui->saveIdCheckBox->setChecked( setting->value( "ConfigId" ).toBool() );
     ui->savePassCheckBox->setChecked( setting->value( "ConfigPass" ).toBool() );
-
     ui->repatSpinBox->setValue( setting->value( "RepeatMin" ).toInt() );
     ui->serverNameEdit->setText( setting->value( "Auth" ).toString() );
+    ui->autoLogoutCheckBox->setChecked( setting->value( "AutoLogout" ).toBool() );
+    ui->renewIPCheckBox->setChecked( setting->value( "AutoRenewIP" ).toBool() );
+    ui->randomizeCheckBox->setChecked( setting->value( "RandomizeEnable" ).toBool() );
+    ui->randomizeSpinBox->setValue( setting->value( "RandomizeRange" ).toInt() );
 
     // if need id,pass
     if ( ui->saveIdCheckBox->isChecked() ) {
@@ -194,7 +226,12 @@ void MainWidget::loadConfigSlot()
 
     // do setting
     if ( ui->autoStartCheckBox->isChecked() ) {
-        // Auto Login
+        // 起動時に自動ログイン
+
+        // Windowsの場合いったんIPをrenewする
+        renewIP();
+        m_ipconfig->waitForFinished();
+
         on_loginButton_clicked();
     }
 
@@ -292,16 +329,7 @@ void MainWidget::renewIP()
 {
     // IPを更新する ( Windows only )
 #ifdef Q_OS_WIN
-    QProcess *process;
-
-    process = new QProcess( this );
-
-    process->start( "ipconfig", QStringList() << "/release" );
-    process->waitForFinished();
-    process->start( "ipconfig", QStringList() << "/renew" );
-    process->waitForFinished();
-
-    delete process;
+    m_ipconfig->start( "ipconfig", QStringList() << "/renew" );
 #endif
 }
 
@@ -370,6 +398,22 @@ void MainWidget::closeEvent(QCloseEvent *)
     if ( trayIcon->isVisible() ) {
         trayIcon->hide();
     }
+
+    // 必要ならログアウト
+    if ( ui->autoLogoutCheckBox->isChecked() ) {
+        // ログアウト処理が完了するまでブロック
+        QEventLoop loop;
+        connect( &webAuth, SIGNAL(finished(LoginWebAuth::AuthStatus)), &loop, SLOT(quit()) );
+
+        // ログアウト実行
+        logoutSlot();
+
+        // イベントループ開始
+        loop.exec();
+    }
+
+    // ipconfigプロセスの終了を待つ
+    m_ipconfig->waitForFinished();
 }
 
 void MainWidget::on_saveConfigButton_clicked()

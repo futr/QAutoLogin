@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>474</width>
-    <height>516</height>
+    <width>359</width>
+    <height>453</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>QAutoLogin</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="resource.qrc">
     <normaloff>:/image/icon.png</normaloff>:/image/icon.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -131,6 +131,33 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QCheckBox" name="randomizeCheckBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Rand&amp;omize! (min)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="randomizeSpinBox">
+       <property name="maximum">
+        <number>2048</number>
+       </property>
+       <property name="value">
+        <number>10</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QProgressBar" name="progressBar">
@@ -219,7 +246,11 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <widget class="QLineEdit" name="ipEdit"/>
+      <widget class="QLineEdit" name="ipEdit">
+       <property name="focusPolicy">
+        <enum>Qt::ClickFocus</enum>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="renewIPButton">
@@ -264,6 +295,20 @@
       <widget class="QCheckBox" name="savePassCheckBox">
        <property name="text">
         <string>Enable save/load &amp;password</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="autoLogoutCheckBox">
+       <property name="text">
+        <string>Logout &amp;when application closes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="renewIPCheckBox">
+       <property name="text">
+        <string>Renew IP a&amp;fter Login/Logout ( Windows only )</string>
        </property>
       </widget>
      </item>
@@ -318,22 +363,33 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
+  <tabstop>serverNameEdit</tabstop>
   <tabstop>idEdit</tabstop>
   <tabstop>passEdit</tabstop>
-  <tabstop>serverNameEdit</tabstop>
   <tabstop>repeatCheckBox</tabstop>
   <tabstop>repatSpinBox</tabstop>
-  <tabstop>stopTimerButton</tabstop>
-  <tabstop>logoutButton</tabstop>
+  <tabstop>randomizeCheckBox</tabstop>
+  <tabstop>randomizeSpinBox</tabstop>
   <tabstop>loginButton</tabstop>
-  <tabstop>ipEdit</tabstop>
+  <tabstop>logoutButton</tabstop>
+  <tabstop>stopTimerButton</tabstop>
+  <tabstop>renewIPButton</tabstop>
   <tabstop>checkIpButton</tabstop>
   <tabstop>autoToTrayCheckBox</tabstop>
   <tabstop>autoStartCheckBox</tabstop>
   <tabstop>saveIdCheckBox</tabstop>
   <tabstop>savePassCheckBox</tabstop>
+  <tabstop>autoLogoutCheckBox</tabstop>
+  <tabstop>renewIPCheckBox</tabstop>
+  <tabstop>saveConfigButton</tabstop>
+  <tabstop>aboutButton</tabstop>
+  <tabstop>minimizePushButton</tabstop>
+  <tabstop>closeButton</tabstop>
+  <tabstop>ipEdit</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>serverNameEdit</sender>

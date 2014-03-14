@@ -84,6 +84,7 @@ private:
     QAction *showAction;
 
     QSettings *setting;
+    QProcess *m_ipconfig;
 };
 
 #endif // MAINWIDGET_H
