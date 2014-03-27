@@ -67,12 +67,19 @@ void MainWidget::on_loginButton_clicked()
     if ( ui->repeatCheckBox->isChecked() ) {
         // repeat login
         int repeatTime;
+        int randTime;
 
         // 必要なら乱数でぶらす
         repeatTime = ui->repatSpinBox->value();
 
         if ( ui->randomizeCheckBox->isChecked() && ui->randomizeSpinBox->value() != 0 ) {
-            repeatTime += ( qrand() % ui->randomizeSpinBox->value() ) * ( ( qrand() % 2 ) * -1 );
+            randTime = qrand() % ui->randomizeSpinBox->value();
+            
+            if ( qrand() % 2 ) {
+                randTime *= -1;
+            }
+            
+            repeatTime += randTime;
         }
 
         if ( repeatTime < 0 ) {
