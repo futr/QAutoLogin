@@ -85,6 +85,8 @@ private:
 
     QSettings *setting;
     QProcess *m_ipconfig;
+
+    bool m_login;
 };
 
 #endif // MAINWIDGET_H

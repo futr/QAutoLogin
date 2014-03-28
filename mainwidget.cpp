@@ -4,7 +4,8 @@
 MainWidget::MainWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWidget),
-    m_ipconfig( new QProcess( this ) )
+    m_ipconfig( new QProcess( this ) ),
+    m_login( false )
 {
     ui->setupUi(this);
 
@@ -172,8 +173,18 @@ void MainWidget::readyReadSlot( LoginWebAuth::AuthStatus stat )
     // ラベルに表示
     ui->messageLabel->setText( title + "\n" + info );
 
-    // 成功していて必要ならIP更新
-    if ( ui->renewIPCheckBox->isChecked() && ( stat == LoginWebAuth::LoginSucceeded || stat == LoginWebAuth::LoginSucceeded ) ) {
+    // 成功していて初回ログインでかつ必要ならIP更新
+    if ( ui->renewIPCheckBox->isChecked() && ( stat == LoginWebAuth::LoginSucceeded && m_login == false ) ) {
+        renewIP();
+    }
+
+    // ログイン済み
+    if ( stat == LoginWebAuth::LoginSucceeded ) {
+        m_login = true;
+    }
+
+    // ログアウトでかつ必要ならIP更新
+    if ( ui->renewIPLogoutCheckBox->isChecked() && stat == LoginWebAuth::LogoutSucceeded ) {
         renewIP();
     }
 }
@@ -192,6 +203,7 @@ void MainWidget::saveConfigSlot()
     setting->setValue( "Auth", ui->serverNameEdit->text() );
     setting->setValue( "AutoLogout", ui->autoLogoutCheckBox->isChecked() );
     setting->setValue( "AutoRenewIP", ui->renewIPCheckBox->isChecked() );
+    setting->setValue( "AutoRenewIPLogout", ui->renewIPLogoutCheckBox->isChecked() );
     setting->setValue( "RandomizeEnable", ui->randomizeCheckBox->isChecked() );
     setting->setValue( "RandomizeRange", ui->randomizeSpinBox->value() );
 
@@ -218,6 +230,7 @@ void MainWidget::loadConfigSlot()
     ui->repatSpinBox->setValue( setting->value( "RepeatMin" ).toInt() );
     ui->serverNameEdit->setText( setting->value( "Auth" ).toString() );
     ui->autoLogoutCheckBox->setChecked( setting->value( "AutoLogout" ).toBool() );
+    ui->renewIPLogoutCheckBox->setChecked( setting->value( "AutoRenewIPLogout" ).toBool() );
     ui->renewIPCheckBox->setChecked( setting->value( "AutoRenewIP" ).toBool() );
     ui->randomizeCheckBox->setChecked( setting->value( "RandomizeEnable" ).toBool() );
     ui->randomizeSpinBox->setValue( setting->value( "RandomizeRange" ).toInt() );
@@ -336,7 +349,17 @@ void MainWidget::renewIP()
 {
     // IPを更新する ( Windows only )
 #ifdef Q_OS_WIN
+    // メッセージ表示
+    ui->messageLabel->setText( tr( "Updating IP address" ) );
+    QApplication::processEvents();
+
+    // ブロックしてipconfigでIP更新
+    m_ipconfig->start( "ipconfig", QStringList() << "/release" );
+    m_ipconfig->waitForFinished();
     m_ipconfig->start( "ipconfig", QStringList() << "/renew" );
+    m_ipconfig->waitForFinished();
+
+    ui->messageLabel->setText( tr( "Update complete" ) );
 #endif
 }
 

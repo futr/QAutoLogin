@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>359</width>
-    <height>453</height>
+    <height>475</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -308,7 +308,14 @@
      <item>
       <widget class="QCheckBox" name="renewIPCheckBox">
        <property name="text">
-        <string>Renew IP a&amp;fter Login/Logout ( Windows only )</string>
+        <string>Renew IP a&amp;fter first Login ( Windows only )</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="renewIPLogoutCheckBox">
+       <property name="text">
+        <string>Renew IP after Lo&amp;gout ( Windows only )</string>
        </property>
       </widget>
      </item>
