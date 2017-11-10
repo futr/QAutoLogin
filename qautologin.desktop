@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=自動ログイン
+GenericName=自動ログイン
+Comment=自動ログイン
+Exec=/opt/qautologin/QAutoLogin
+Icon=/opt/qautologin/appicon.ico
+Terminal=false
+Categories=Application;
+StartupNotify=true
+
